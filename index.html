@@ -103,59 +103,62 @@ const rawWordsRepo = {
     'C2': ['Aberration', 'Anachronism', 'Cacophony', 'Epitome', 'Idiosyncrasy', 'Juxtaposition', 'Nefarious', 'Obfuscate', 'Quintessential', 'Sycophant']
 };
 
+// Переменная для хранения ссылки на аудиофайл текущего слова
+let currentAudioUrl = '';
+
 async function fetchWordDetails(wordText) {
     const cleanWord = wordText.trim();
-    let phonetic = "/.../";
-    let translation = "Переклад не знайдено";
-    
-    // 1. Запрос транскрипции напрямую (Dictionary API отлично работает БЕЗ прокси)
-    try {
-        const dictRes = await fetch(`https://dictionaryapi.dev{cleanWord.toLowerCase()}`);
-        if (dictRes.ok) {
-            const dictData = await dictRes.json();
-            if (Array.isArray(dictData) && dictData[0]) {
-                phonetic = dictData[0].phonetic || "/.../";
-                if (phonetic === "/.../" && dictData[0].phonetics) {
-                    const found = dictData[0].phonetics.find(p => p.text);
-                    if (found) phonetic = found.text;
-                }
-            }
-        }
-    } catch(e) {
-        console.warn("Не вдалося завантажити транскрипцію:", e);
-    }
+    let phonetic = "/.../", translation = "Переклад не знайдено";
+    currentAudioUrl = ''; // Сброс аудио для нового слова
 
-    // 2. Запрос перевода через официальный Google GTX API (он разрешен для всех localhost без CORS)
+    // Используем прокси для обхода CORS и делаем запрос к Cambridge Dictionary
+    const proxyUrl = "https://herokuapp.com";
+    const targetUrl = `https://cambridge.org{cleanWord.toLowerCase()}`;
+
     try {
-        const gtxUrl = `https://googleapis.com{encodeURIComponent(cleanWord)}`;
-        const transRes = await fetch(gtxUrl);
-        if (transRes.ok) {
-            const transData = await transRes.json();
-            // Разбор нативного массива Google Translate
-            if (transData && transData[0] && transData[0][0] && transData[0][0][0]) {
-                translation = transData[0][0][0].trim();
-                translation = translation.charAt(0).toUpperCase() + translation.slice(1);
+        const response = await fetch(proxyUrl + targetUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (response.ok) {
+            const htmlText = await response.text();
+            const doc = new DOMParser().parseFromString(htmlText, 'text/html');
+
+            // Парсинг перевода, транскрипции и аудио
+            const translationElement = doc.querySelector('.trans.dtrans.dtrans-se');
+            if (translationElement) translation = translationElement.innerText.trim();
+            
+            const ipaElement = doc.querySelector('.uk.dpron-i .ipa.dipa.lmd-2, .ipa.dipa');
+            if (ipaElement) phonetic = `/${ipaElement.innerText.trim()}/`;
+
+            const audioSource = doc.querySelector('.uk.dpron-i source[type="audio/mpeg"]');
+            if (audioSource?.getAttribute('src')) {
+                currentAudioUrl = 'https://cambridge.org' + audioSource.getAttribute('src');
             }
-        }
-    } catch(e) {
-        console.warn("Помилка Google API, пробуємо резерв MyMemory:", e);
+        } else throw new Error('Ошибка словаря');
+    } catch (e) {
+        // Резервный вариант через Google Translate
         try {
-            const myMemRes = await fetch(`https://translated.net{encodeURIComponent(cleanWord)}&langpair=en|uk`);
-            if (myMemRes.ok) {
-                const data = await myMemRes.json();
-                if (data?.responseData?.translatedText) {
-                    translation = data.responseData.translatedText.trim();
-                    translation = translation.charAt(0).toUpperCase() + translation.slice(1);
-                }
-            }
-        } catch(err) {
-            translation = "Помилка мережі";
-        }
+            const gtxUrl = `https://googleapis.com{encodeURIComponent(cleanWord)}`;
+            const transRes = await fetch(gtxUrl);
+            const data = await transRes.json();
+            if (data?.[0]?.[0]?.[0]) translation = data[0][0][0].trim();
+        } catch (err) { translation = "Помилка мережі"; }
     }
-
     return { w: cleanWord, p: phonetic, t: translation };
 }
 
+// Воспроизведение аудио из Cambridge или синтезатор речи
+function speak(text) {
+    if (currentAudioUrl) {
+        new Audio(currentAudioUrl).play().catch(e => console.warn(e));
+    } else {
+        window.speechSynthesis.cancel();
+        const ut = new SpeechSynthesisUtterance(text);
+        ut.lang = 'en-US';
+        window.speechSynthesis.speak(ut);
+    }
+}
 
 let currentDeck = [];
 const stack = document.getElementById('stack');
