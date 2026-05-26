@@ -44,7 +44,7 @@
         .zone-left { 
             left: 0; top: 0; bottom: 0; width: 120px; 
             writing-mode: vertical-rl; transform: rotate(180deg);
-            border-right: 2px dashed var(--dashed);
+            border-left: 2px dashed var(--dashed);
             padding-left: 20px;
         }
         .zone-right { 
@@ -94,280 +94,137 @@
     <div class="status-info" id="status">ЗАВАНТАЖЕННЯ...</div>
 
 <script>
-const database = {
-    'C1': [
-        { w: "Abstraction", p: "/æbˈstrækʃn/", t: "Абстракція" }, { w: "Asynchronous", p: "/eɪˈsɪŋkrənəs/", t: "Асинхронний" },
-        { w: "Scalability", p: "/ˌskeɪləˈbɪləti/", t: "Масштабованість" }, { w: "Concurrency", p: "/kənˈkʌrənsi/", t: "Паралелізм" },
-        { w: "Deployment", p: "/dɪˈplɔɪməнт/", t: "Розгортання" }, { w: "Encapsulation", p: "/ɪnˌkæpsuˈleɪʃn/", t: "Інкапсуляція" },
-        { w: "Framework", p: "/ˈfreɪmwɜːrk/", t: "Фреймворк" }, { w: "Refactoring", p: "/ˌriːˈfæktərɪŋ/", t: "Рефакторинг" },
-        { w: "Middleware", p: "/ˈmɪdlwer/", t: "Проміжне ПЗ" }, { w: "Optimization", p: "/ˌɒptɪmaɪˈzeɪʃn/", t: "Оптимізація" },
-        { w: "Throughput", p: "/ˈθruːpʊt/", t: "Пропускна здатність" }, { w: "Backend", p: "/ˈbækend/", t: "Серверна частина" },
-        { w: "Frontend", p: "/ˈfrʌntend/", t: "Клієнтська частина" }, { w: "Infrastructure", p: "/ˈɪnfrəstrʌktʃər/", t: "Інфраструктура" },
-        { w: "Architecture", p: "/ˈɑːrkɪtektʃər/", t: "Архітектура" }, { w: "Legacy", p: "/ˈleɡəsi/", t: "Застарілий (код)" },
-        { w: "Vulnerability", p: "/ˌvʌlnərəˈbɪləti/", t: "Вразливість" }, { w: "Encryption", p: "/ɪnˈkrɪpʃn/", t: "Шифрування" },
-        { w: "Environment", p: "/ɪnˈvaɪrənmənt/", t: "Середовище" }, { w: "Benchmark", p: "/ˈbentʃmɑːrk/", t: "Еталон / Тест" },
-        { w: "Microservices", p: "/ˌmaɪkrəʊˈsɜːrvɪsɪz/", t: "Мікросервіси" }, { w: "Latency", p: "/ˈleɪtənsi/", t: "Затримка" },
-        { w: "Debugging", p: "/ˌdiːˈbʌɡɪŋ/", t: "Налагодження" }, { w: "Prototype", p: "/ˈprəʊtətaɪp/", t: "Прототип" },
-        { w: "Integration", p: "/ˌɪntɪˈɡreɪʃn/", t: "Інтеграція" }, { w: "Agile", p: "/ˈædʒaɪl/", t: "Гнучка методологія" },
-        { w: "Waterfall", p: "/ˈwɔːtərfɔːl/", t: "Каскадна модель" }, { w: "Authentication", p: "/ɔːˌθentɪˈkeɪʃn/", t: "Автентифікація" },
-        { w: "Authorization", p: "/ˌɔːθəraɪˈzeɪʃn/", t: "Авторизація" }, { w: "Database", p: "/ˈdeɪtəbeɪs/", t: "База даних" },
-        { w: "Interface", p: "/ˈɪntərfeɪs/", t: "Інтерфейс" }, { w: "Compiler", p: "/kəmˈpaɪlər/", t: "Компілятор" },
-        { w: "Protocol", p: "/ˈprəʊtəkɒl/", t: "Протокол" }, { w: "Algorithm", p: "/ˈælɡərɪðəm/", t: "Алгоритм" },
-        { w: "Bandwidth", p: "/ˈbændwɪdθ/", t: "Ширина каналу" }, { w: "Clustering", p: "/ˈklʌstərɪŋ/", t: "Кластеризація" },
-        { w: "Virtualization", p: "/ˌvɜːrtʃuəlaɪˈzeɪʃn/", t: "Віртуалізація" }, { w: "DevOps", p: "/ˈdevɒps/", t: "Девопс" },
-        { w: "Scripting", p: "/ˈskrɪptɪŋ/", t: "Написання скриптів" }, { w: "Automation", p: "/ˌɔːtəˈmeɪʃn/", t: "Автоматизація" },
-        { w: "Container", p: "/kənˈteɪnər/", t: "Контейнер" }, { w: "Registry", p: "/ˈredʒɪstri/", t: "Реєстр" },
-        { w: "Endpoint", p: "/ˈendpɔɪnt/", t: "Кінцева точка" }, { w: "Snapshot", p: "/ˈsnæpʃɒt/", t: "Миттєвий знімок" },
-        { w: "Pragmatic", p: "/præɡˈmætɪk/", t: "Прагматичний" }, { w: "Cognizant", p: "/ˈkɒɡnɪzənt/", t: "Обізнаний" },
-        { w: "Resilience", p: "/rɪˈzɪliəns/", t: "Стійкість" }, { w: "Paradigm", p: "/ˈpærədaɪm/", t: "Парадигма" },
-        { w: "Exacerbate", p: "/ɪɡˈzæsərbeɪt/", t: "Загострювати" }, { w: "Ambiguous", p: "/æmˈbɪɡjuəs/", t: "Двозначний" },
-        { w: "Conundrum", p: "/kəˈnʌndrəm/", t: "Головоломка" }, { w: "Meticulous", p: "/məˈtɪkjələs/", t: "Ретельний" },
-        { w: "Ubiquitous", p: "/juːˈbɪkwɪtəs/", t: "Всюдисущий" }, { w: "Benevolent", p: "/bəˈnevələnt/", t: "Доброзичливий" },
-        { w: "Viability", p: "/ˌvaɪəˈbɪləti/", t: "Життєздатність" }, { w: "Leverage", p: "/ˈliːvərɪдʒ/", t: "Важіль / Використовувати" }, { w: "Adversary", p: "/ˈædvərsəri/", t: "Опонент / Супротивник" },
-        { w: "Advocate", p: "/ˈædvəkeɪt/", t: "Прихильник / Відстоювати" },
-        { w: "Affluence", p: "/ˈæfluəns/", t: "Достаток / Багатство" },
-        { w: "Aggregate", p: "/ˈæɡrɪɡət/", t: "Сукупний / Агрегований" },
-        { w: "Allocation", p: "/ˌæləˈkeɪʃn/", t: "Розподіл (ресурсів)" },
-        { w: "Animosity", p: "/ˌænɪˈmɒsəti/", t: "Ворожість" },
-        { w: "Anomaly", p: "/əˈnɒməli/", t: "Аномалія" },
-        { w: "Apprehension", p: "/ˌæprɪˈhenʃn/", t: "Побоювання" },
-        { w: "Arbitrary", p: "/ˈɑːrbɪtrəri/", t: "Довільний" },
-        { w: "Assiduous", p: "/əˈsɪdʒuəs/", t: "Старанний" },
-        { w: "Augment", p: "/ɔːɡˈment/", t: "Збільшувати / Доповнювати" },
-        { w: "Authenticity", p: "/ˌɔːθenˈtɪsəti/", t: "Справжність" },
-        { w: "Autonomous", p: "/ɔːˈtɒnəməs/", t: "Автономний" },
-        { w: "Backlash", p: "/ˈbæklæʃ/", t: "Зворотна негативна реакція" },
-        { w: "Belligerent", p: "/bəˈlɪdʒərənt/", t: "Войовничий" },
-        { w: "Breach", p: "/briːtʃ/", t: "Порушення / Пролом" },
-        { w: "Coherence", p: "/kəʊˈhɪərəns/", t: "Узгодженість" },
-        { w: "Collaboration", p: "/kəˌlæbəˈreɪʃn/", t: "Співпраця" },
-        { w: "Commence", p: "/kəˈmens/", t: "Починати" },
-        { w: "Compelling", p: "/kəmˈpelɪŋ/", t: "Переконливий" },
-        { w: "Complacency", p: "/kəmˈpleɪsnsi/", t: "Самовдоволення" },
-        { w: "Comprehensive", p: "/ˌkɒmprɪˈhensɪv/", t: "Всеосяжний" },
-        { w: "Concede", p: "/kənˈsiːd/", t: "Поступатися / Визнавати" },
-        { w: "Concise", p: "/kənˈsaɪs/", t: "Стислий / Короткий" },
-        { w: "Condone", p: "/kənˈdəʊn/", t: "Миритися з / Попускати" },
-        { w: "Conformity", p: "/kənˈfɔːrməti/", t: "Відповідність" },
-        { w: "Congruent", p: "/ˈkɒŋɡruənt/", t: "Конгруентний / Схожий" },
-        { w: "Consensus", p: "/kənˈsensəs/", t: "Консенсус" },
-        { w: "Constraint", p: "/kənˈstreɪnt/", t: "Обмеження" },
-        { w: "Contradiction", p: "/ˌkɒntrəˈdɪkʃn/", t: "Протиріччя" },
-        { w: "Correlation", p: "/ˌkɒrəˈleɪʃn/", t: "Взаємозв'язок" },
-        { w: "Credibility", p: "/ˌkredəˈbɪləti/", t: "Достовірність" },
-        { w: "Culminate", p: "/ˈkʌlmɪneɪt/", t: "Досягати вершини" },
-        { w: "Cynical", p: "/ˈsɪnɪkl/", t: "Цинічний" },
-        { w: "Decipher", p: "/dɪˈsaɪfər/", t: "Розшифрувати" },
-        { w: "Deficiency", p: "/dɪˈfɪʃnsi/", t: "Дефіцит / Нестача" },
-        { w: "Deliberate", p: "/dɪˈlɪbərət/", t: "Навмисний" },
-        { w: "Depict", p: "/dɪˈpɪkt/", t: "Зображати" },
-        { w: "Deteriorate", p: "/dɪˈtɪəriəreɪt/", t: "Погіршуватися" },
-        { w: "Deviation", p: "/ˌdiːviˈeɪʃn/", t: "Відхилення" },
-        { w: "Discrepancy", p: "/dɪˈskrepənsi/", t: "Невідповідність" },
-        { w: "Disseminate", p: "/dɪˈsemɪneɪt/", t: "Поширювати" },
-        { w: "Divergent", p: "/daɪˈvɜːrdʒənt/", t: "Розбіжний" },
-        { w: "Dormant", p: "/ˈdɔːrmənt/", t: "Сплячий / Неактивний" },
-        { w: "Drastic", p: "/ˈdræstɪk/", t: "Різкий / Радикальний" },
-        { w: "Durability", p: "/ˌdʊrəˈbɪləti/", t: "Довговічність" },
-        { w: "Eclectic", p: "/ɪˈklektɪк/", t: "Еклектичний" },
-        { w: "Efficacy", p: "/ˈefɪkəsi/", t: "Ефективність" },
-        { w: "Elaborate", p: "/ɪˈlæbərət/", t: "Детально розроблений" },
-        { w: "Eloquent", p: "/ˈeləkwənt/", t: "Красномовний" },
-        { w: "Embody", p: "/ɪmˈbɒdi/", t: "Втілювати" },
-        { w: "Empirical", p: "/ɪmˈpɪrɪkl/", t: "Емпіричний" },
-        { w: "Endeavor", p: "/ɪnˈdevər/", t: "Зусилля / Прагнення" },
-        { w: "Enhance", p: "/ɪnˈhæns/", t: "Покращувати" },
-        { w: "Envisage", p: "/ɪnˈvɪzɪdʒ/", t: "Передбачати" },
-        { w: "Equivocal", p: "/ɪˈkwɪvəkl/", t: "Двозначний" },
-        { w: "Erode", p: "/ɪˈrəʊd/", t: "Розмивати / Руйнувати" },
-        { w: "Erroneous", p: "/ɪˈrəʊniəs/", t: "Помилковий" },
-        { w: "Escalate", p: "/ˈeskəleɪt/", t: "Загострювати" },
-        { w: "Exclusive", p: "/ɪkˈskluːsɪv/", t: "Виключний" },
-        { w: "Exemplary", p: "/ɪɡˈzempləri/", t: "Зразковий" },
-        { w: "Exert", p: "/ɪɡˈzɜːrt/", t: "Докладати (зусиль)" },
-        { w: "Explicit", p: "/ɪkˈsplɪsɪt/", t: "Явний" },
-        { w: "Exploit", p: "/ɪkˈsplɔɪt/", t: "Експлуатувати / Використовувати" },
-        { w: "Extensive", p: "/ɪkˈstensɪv/", t: "Обширний" },
-        { w: "Fabricate", p: "/ˈfæbrɪkeɪt/", t: "Вигадувати / Виготовляти" },
-        { w: "Facilitate", p: "/fəˈsɪlɪteɪt/", t: "Сприяти" },
-        { w: "Fallacy", p: "/ˈfæləsi/", t: "Помилка / Омана" },
-        { w: "Feasible", p: "/ˈfiːzəbl/", t: "Здійсненний" },
-        { w: "Fluctuation", p: "/ˌflʌktʃuˈeɪʃn/", t: "Коливання" },
-        { w: "Formidable", p: "/ˈfɔːrmɪdəbl/", t: "Грізний / Грандіозний" },
-        { w: "Fostering", p: "/ˈfɒstərɪŋ/", t: "Сприяння / Виховання" },
-        { w: "Fundamental", p: "/ˌfʌndəˈmentl/", t: "Фундаментальний" },
-        { w: "Generic", p: "/dʒəˈnerɪk/", t: "Загальний" },
-        { w: "Hinder", p: "/ˈhɪndər/", t: "Перешкоджати" },
-        { w: "Hypothetical", p: "/ˌhaɪpəˈθetɪkl/", t: "Гіпотетичний" },
-        { w: "Implication", p: "/ˌɪmplɪˈkeɪʃn/", t: "Наслідок / Підтекст" },
-        { w: "Implicit", p: "/ɪmˈplɪsɪt/", t: "Неявний" },
-        { w: "Incentive", p: "/ɪnˈsentɪv/", t: "Стимул" },
-        { w: "Inherent", p: "/ɪnˈhɪərənt/", t: "Властивий / Природний" },
-        { w: "Inhibit", p: "/ɪnˈhɪbɪt/", t: "Пригнічувати / Гальмувати" },
-        { w: "Innovation", p: "/ˌɪnəˈveɪʃn/", t: "Інновація" },
-        { w: "Insight", p: "/ˈɪnsaɪt/", t: "Розуміння / Проникливість" },
-        { w: "Integration", p: "/ˌɪntɪˈɡreɪʃn/", t: "Інтеграція" },
-        { w: "Intensity", p: "/ɪnˈtensəti/", t: "Інтенсивність" },
-        { w: "Internalize", p: "/ɪnˈtɜːrnəlaɪz/", t: "Засвоювати" },
-        { w: "Interpret", p: "/ɪnˈtɜːrprət/", t: "Тлумачити" },
-        { w: "Intricate", p: "/ˈɪntrɪkət/", t: "Заплутаний" },
-        { w: "Intrinsic", p: "/ɪnˈtrɪnzɪk/", t: "Внутрішній / Притаманний" },
-        { w: "Invaluable", p: "/ɪnˈvæljuəbl/", t: "Безцінний" },
-        { w: "Judicious", p: "/dʒuˈdɪʃəs/", t: "Розважливий" },
-        { w: "Justification", p: "/ˌdʒʌstɪfɪˈkeɪʃn/", t: "Виправдання" },
-        { w: "Kinetic", p: "/kɪˈnetɪk/", t: "Кінетичний" },
-        { w: "Liability", p: "/ˌlaɪəˈbɪləti/", t: "Відповідальність / Зобов'язання" },
-        { w: "Lucid", p: "/ˈluːsɪd/", t: "Ясний / Зрозумілий" },
-        { w: "Manifest", p: "/ˈmænɪfest/", t: "Проявляти" },
-        { w: "Marginal", p: "/ˈmɑːrdʒɪnl/", t: "Незначний" },
-        { w: "Mediate", p: "/ˈmiːdieɪt/", t: "Бути посередником" },
-        { w: "Mitigate", p: "/ˈmɪtɪɡeɪt/", t: "Пом'якшувати" },
-        { w: "Objective", p: "/əbˈdʒektɪv/", t: "Об'єктивний / Мета" }
-    ],
-    'C2': [
-        { w: "Aberration", p: "/ˌæbəˈreɪʃn/", t: "Відхилення від норми" },
-        { w: "Abnegation", p: "/ˌæbnɪˈɡeɪʃn/", t: "Самовідречення" },
-        { w: "Abstruse", p: "/əbˈstruːs/", t: "Глибокодумний / Важкий для розуміння" },
-        { w: "Acumen", p: "/əˈkjuːmən/", t: "Проникливість / Кмітливість" },
-        { w: "Anachronism", p: "/əˈnækrənɪzəm/", t: "Анахронізм / Невідповідність часу" },
-        { w: "Arcane", p: "/ɑːrˈkeɪn/", t: "Таємничий / Прихований" },
-        { w: "Ascetic", p: "/əˈsetɪk/", t: "Аскетичний" },
-        { w: "Bellicose", p: "/ˈbelɪkəʊs/", t: "Войовничий" },
-        { w: "Callous", p: "/ˈkæləs/", t: "Черствий / Бездушний" },
-        { w: "Capitulate", p: "/kəˈpɪtʃuleɪt/", t: "Капітулювати" },
-        { w: "Chicanery", p: "/ʃɪˈkeɪnəri/", t: "Крутійство / Махінації" },
-        { w: "Circumlocution", p: "/ˌsɜːrkəmləˈkjuːʃn/", t: "Багатослів'я / Ухильна мова" },
-        { w: "Cognoscenti", p: "/ˌkɒnjəˈʃenti/", t: "Знавці / Експерти" },
-        { w: "Compendium", p: "/kəmˈpendiəm/", t: "Збірник / Короткий виклад" },
-        { w: "Concomitant", p: "/kənˈkɒmɪtənt/", t: "Супутній" },
-        { w: "Conflagration", p: "/ˌkɒnfləˈɡreɪʃn/", t: "Велика пожежа" },
-        { w: "Contentious", p: "/kənˈtenʃəs/", t: "Спірний / Сварливий" },
-        { w: "Corpulent", p: "/ˈkɔːrpjələnt/", t: "Огрядний / Гладкий" },
-        { w: "Delineate", p: "/dɪˈlɪnieɪt/", t: "Окреслювати / Описувати" },
-        { w: "Demagogue", p: "/ˈdeməɡɒɡ/", t: "Демагог" },
-        { w: "Despot", p: "/ˈdespɒt/", t: "Деспот / Тиран" },
-        { w: "Desuetude", p: "/ˈdeswɪtjuːd/", t: "Забуття / Стан занепаду" },
-        { w: "Diaphanous", p: "/daɪˈæfənəs/", t: "Прозорий / Невагомий" },
-        { w: "Diatribe", p: "/ˈdaɪətraɪb/", t: "Уїдлива критика" },
-        { w: "Didactic", p: "/daɪˈdæktɪk/", t: "Повчальний" },
-        { w: "Ebullient", p: "/ɪˈbʌliənt/", t: "Живий / Сповнений енергії" },
-        { w: "Efficacy", p: "/ˈefɪkəsi/", t: "Ефективність / Сила" },
-        { w: "Egregious", p: "/ɪˈɡriːdʒəs/", t: "Жахливий / Кричущий" },
-        { w: "Enervate", p: "/ˈenərveɪt/", t: "Знесилювати" },
-        { w: "Ephemeral", p: "/ɪˈfemərəl/", t: "Ефемерний / Тимчасовий" },
-        { w: "Equanimity", p: "/ˌekwəˈnɪməti/", t: "Хладнокровність" },
-        { w: "Erudite", p: "/ˈerudaɪt/", t: "Ерудований" },
-        { w: "Esoteric", p: "/ˌesəˈterɪk/", t: "Езотеричний / Для вузького кола" },
-        { w: "Exculpate", p: "/ˈekskʌlpeɪt/", t: "Виправдовувати" },
-        { w: "Execrable", p: "/ˈeksɪkrəbl/", t: "Огидний / Поганий" },
-        { w: "Exigency", p: "/ˈeksɪdʒənsi/", t: "Крайня потреба / Вимога" },
-        { w: "Facetious", p: "/fəˈsiːʃəs/", t: "Жартівливий (часто недоречно)" },
-        { w: "Fastidious", p: "/fæˈstɪdiəs/", t: "Вибагливий / Прискіпливий" },
-        { w: "Fatuous", p: "/ˈfætʃuəs/", t: "Безглуздий / Дуже дурний" },
-        { w: "Garrulous", p: "/ˈɡærələs/", t: "Болтливий" },
-        { w: "Grandiloquent", p: "/ɡrænˈdɪləkwənt/", t: "Пишномовний" },
-        { w: "Gregarious", p: "/ɡrɪˈɡeəriəs/", t: "Товариський" },
-        { w: "Hegemony", p: "/hɪˈɡeməni/", t: "Гегемонія / Панування" },
-        { w: "Histrionic", p: "/ˌhɪstriˈɒnɪk/", t: "Театральний / Награний" },
-        { w: "Iconoclast", p: "/aɪˈkɒnəklæst/", t: "Іконоборець / Бунтівник" },
-        { w: "Idiosyncrasy", p: "/ˌɪdiəˈsɪŋkrəsi/", t: "Ідіосинкразія / Особливість" },
-        { w: "Impecunious", p: "/ˌɪmpɪˈkjuːniəs/", t: "Бідний / Без грошей" },
-        { w: "Inchoate", p: "/ɪnˈkəʊət/", t: "Зародковий / Нерозвинений" },
-        { w: "Inexorable", p: "/ɪnˈeksərəbl/", t: "Невблаганний" },
-        { w: "Inimical", p: "/ɪˈnɪmɪkl/", t: "Ворожий / Шкідливий" },
-        { w: "Inscrutable", p: "/ɪnˈskruːtəbl/", t: "Загадковий / Непроникний" },
-        { w: "Insipid", p: "/ɪnˈsɪpɪd/", t: "Прісний / Нудний" },
-        { w: "Intransigent", p: "/ɪnˈtrænsɪdʒənt/", t: "Непоступливий" },
-        { w: "Inundate", p: "/ˈɪnʌndeɪt/", t: "Затоплювати / Засипати" },
-        { w: "Invective", p: "/ɪnˈvektɪv/", t: "Лайка / Образа" },
-        { w: "Inveterate", p: "/ɪnˈvetərət/", t: "Закоренілий" },
-        { w: "Jingoism", p: "/ˈdʒɪŋɡəʊɪzəm/", t: "Ультрапатріотизм" },
-        { w: "Juxtaposition", p: "/ˌdʒʌkstəpəˈzɪʃn/", t: "Зіставлення" },
-        { w: "Laconic", p: "/ləˈkɒnɪk/", t: "Лаконічний" },
-        { w: "Lethargic", p: "/ləˈθɑːrdʒɪk/", t: "Млявий / Летаргічний" },
-        { w: "Loquacious", p: "/ləˈkweɪʃəs/", t: "Балакучий" },
-        { w: "Magnanimous", p: "/mæɡˈnænɪməs/", t: "Великодушний" },
-        { w: "Maverick", p: "/ˈmævərɪk/", t: "Інакодумець / Біла ворона" },
-        { w: "Mellifluous", p: "/meˈlɪfluəs/", t: "Мелодійний / Солодкоголосий" },
-        { w: "Mendacious", p: "/menˈdeɪʃəs/", t: "Брехливий" },
-        { w: "Meretricious", p: "/ˌmerɪˈtrɪʃəs/", t: "Показний / Дешевий" },
-        { w: "Meticulous", p: "/məˈtɪkjələс/", t: "Ретельний" },
-        { w: "Misanthrope", p: "/ˈmɪzənθrəʊp/", t: "Мізантроп" },
-        { w: "Modicum", p: "/ˈmɒdɪkəm/", t: "Крихти / Невелика кількість" },
-        { w: "Multifarious", p: "/ˌmʌltɪˈfeəriəs/", t: "Різноманітний" },
-        { w: "Nadir", p: "/ˈneɪdɪər/", t: "Найнижча точка" },
-        { w: "Nefarious", p: "/nɪˈferiəs/", t: "Мерзенний" },
-        { w: "Neophyte", p: "/ˈniːəfaɪt/", t: "Новачок" },
-        { w: "Obdurate", p: "/ˈɒbdjʊreɪt/", t: "Упертий" },
-        { w: "Obfuscate", p: "/ˈɒbfʌskeɪt/", t: "Заплутувати" },
-        { w: "Obsequious", p: "/əbˈsiːkwiəs/", t: "Улесливий" },
-        { w: "Ostracism", p: "/ˈɒstrəsɪzəm/", t: "Вигнання з суспільства" },
-        { w: "Palliate", p: "/ˈpælieɪt/", t: "Пом'якшувати (симптоми)" },
-        { w: "Panacea", p: "/ˌpænəˈsiːə/", t: "Панацея / Ліки від усього" },
-        { w: "Parsimonious", p: "/ˌpɑːrsɪˈməʊniəs/", t: "Скупий" },
-        { w: "Paucity", p: "/ˈpɔːsəti/", t: "Брак / Недостатність" },
-        { w: "Pellucid", p: "/pəˈluːsɪd/", t: "Дуже прозорий / Ясний" },
-        { w: "Penchant", p: "/ˈpentʃənt/", t: "Схильність / Тяга" },
-        { w: "Perfidious", p: "/pərˈfɪdiəs/", t: "Зрадницький" },
-        { w: "Pernicious", p: "/pərˈnɪʃəs/", t: "Згубний / Шкідливий" },
-        { w: "Perspicacious", p: "/ˌpɜːrspɪˈkeɪʃəs/", t: "Проникливий" },
-        { w: "Plethora", p: "/ˈpleθərə/", t: "Надлишок" },
-        { w: "Pragmatic", p: "/præɡˈmætɪk/", t: "Прагматичний" },
-        { w: "Precipitous", p: "/prɪˈsɪpɪtəs/", t: "Стрімкий / Обривистий" },
-        { w: "Proclivity", p: "/prəˈklɪvəti/", t: "Схильність" },
-        { w: "Promulgate", p: "/ˈprɒmlɡeɪt/", t: "Проголошувати / Оприлюднювати" },
-        { w: "Puissant", p: "/ˈpwiːsænt/", t: "Могутній" },
-        { w: "Quagmire", p: "/ˈkwæɡmaɪər/", t: "Трясовина / Скрутне становище" },
-        { w: "Quiescent", p: "/kwiˈesnt/", t: "Спокійний / Неактивний" },
-        { w: "Rancor", p: "/ˈræŋkər/", t: "Злоба / Гіркота" },
-        { w: "Recalcitrant", p: "/rɪˈkælsɪtrənt/", t: "Непокірний" },
-        { w: "Salient", p: "/ˈseɪliənt/", t: "Найважливіший / Характерний" },
-        { w: "Sycophant", p: "/ˈsɪkəfænt/", t: "Підлабузник" },
-        { w: "Taciturn", p: "/ˈtæsɪtɜːrn/", t: "Мовчазний" },
-        { w: "Ubiquitous", p: "/juːˈbɪkwɪtəs/", t: "Всюдисущий" },
-        { w: "Idempotent", p: "/ˌaɪdɛmˈpəʊtənt/", t: "Ідемпотентний" }, { w: "Ephemeral", p: "/ɪˈfemərəl/", t: "Ефемерний" },
-        { w: "Ineffable", p: "/ɪnˈefəbl/", t: "Невимовний" }, { w: "Obsequious", p: "/əbˈsiːkwiəs/", t: "Улесливий" },
-        { w: "Pernicious", p: "/pərˈnɪʃəs/", t: "Згубний" }, { w: "Alacrity", p: "/əˈlækrəti/", t: "Жвавість" },
-        { w: "Chimerical", p: "/kaɪˈmerɪkl/", t: "Химеричний" }, { w: "Fastidious", p: "/fæˈstɪdiəs/", t: "Вибагливий" },
-        { w: "Garrulous", p: "/ˈɡærələs/", t: "Болтливий" }, { w: "Inchoate", p: "/ɪnˈkəʊət/", t: "Зародковий" },
-        { w: "Nefarious", p: "/nɪˈferiəs/", t: "Мерзенний" }, { w: "Reticent", p: "/ˈretɪsnt/", t: "Скритний" },
-        { w: "Sycophant", p: "/ˈsɪkəfænt/", t: "Підлабузник" }, { w: "Taciturn", p: "/ˈtæsɪtɜːrn/", t: "Мовчазний" },
-        { w: "Voracious", p: "/vəˈreɪʃəs/", t: "Ненаситний" }, { w: "Vicissitude", p: "/vɪˈsɪsɪtjuːd/", t: "Мінливість" },
-        { w: "Winnow", p: "/ˈwɪnəʊ/", t: "Відсіювати" }, { w: "Zealous", p: "/ˈzeləs/", t: "Завзятий" },
-        { w: "Abnegation", p: "/ˌæbnɪˈɡeɪʃn/", t: "Самовідречення" }, { w: "Beguile", p: "/bɪˈɡaɪl/", t: "Оманювати" },
-        { w: "Capricious", p: "/kəˈprɪʃəs/", t: "Капризний" }, { w: "Demagogue", p: "/ˈdeməɡɒɡ/", t: "Демагог" },
-        { w: "Exculpate", p: "/ˈekskʌlpeɪt/", t: "Виправдовувати" }, { w: "Fatuous", p: "/ˈfætʃuəs/", t: "Безглуздий" },
-        { w: "Grandiloquent", p: "/ɡrænˈdɪləkwənt/", t: "Пишномовний" }, { w: "Iconoclast", p: "/aɪˈkɒnəklæst/", t: "Іконоборець" },
-        { w: "Laconic", p: "/ləˈkɒnɪk/", t: "Лаконічний" }, { w: "Maverick", p: "/ˈmævərɪk/", t: "Інакодумець" },
-        { w: "Nadir", p: "/ˈneɪdɪər/", t: "Найнижча точка" }, { w: "Ostracism", p: "/ˈɒstrəsɪzəm/", t: "Остракізм" },
-        { w: "Paucity", p: "/ˈpɔːsəti/", t: "Брак / Дефіцит" }, { w: "Quagmire", p: "/ˈkwæɡmaɪər/", t: "Скрутне становище" },
-        { w: "Salient", p: "/ˈseɪliənt/", t: "Найбільш помітний" }, { w: "Tirade", p: "/taɪˈreɪd/", t: "Тирада" },
-        { w: "Umbrage", p: "/ˈʌmbrɪdʒ/", t: "Образа" }, { w: "Venerate", p: "/ˈvenəreɪt/", t: "Шанувати" },
-        { w: "Wily", p: "/ˈwaɪli/", t: "Хитрий" }, { w: "Yoke", p: "/jəʊk/", t: "Ярмо" },
-        { w: "Bellicose", p: "/ˈbelɪkəʊs/", t: "Войовничий" }, { w: "Enervate", p: "/ˈenərveɪt/", t: "Знесилювати" },
-        { w: "Histrionic", p: "/ˌhɪstriˈɒnɪk/", t: "Театральний" }, { w: "Mellifluous", p: "/meˈlɪfluəs/", t: "Милозвучний" },
-        { w: "Obdurate", p: "/ˈɒbdjʊreɪt/", t: "Запеклий" }, { w: "Parsimonious", p: "/ˌpɑːrsɪˈməʊniəs/", t: "Скупий" },
-        { w: "Quiescent", p: "/kwiˈesnt/", t: "Тихий" }, { w: "Recalcitrant", p: "/rɪˈkælsɪtrənt/", t: "Непокірний" },
-        { w: "Scurrilous", p: "/ˈskʌrələs/", t: "Грубий / Образливий" }, { w: "Truculent", p: "/ˈtrʌkjələnt/", t: "Агресивний" },
-        // Advanced IT
-        { w: "Obfuscation", p: "/ˌɒbfʌˈskeɪʃn/", t: "Заплутування (коду)" }, { w: "Interoperability", p: "/ˌɪntərˌɒpərəˈbɪləti/", t: "Взаємосумісність" },
-        { w: "Polymorphism", p: "/ˌpɒlɪˈmɔːrfɪzəm/", t: "Поліморфізм" }, { w: "Inheritance", p: "/ɪnˈherɪtəns/", t: "Успадкування" }
-    ],
-    'A1': [{w: "Water", p: "/ˈwɔːtər/", t: "Вода"}, {w: "Family", p: "/ˈfæməli/", t: "Сім'я"}],
-    'A2': [{w: "Believe", p: "/bɪˈliːv/", t: "Вірити"}],
-    'B1': [{w: "Appropriate", p: "/əˈprəʊpriət/", t: "Відповідний"}],
-    'B2': [{w: "Sustainable", p: "/səˈsteɪnəbl/", t: "Сталий"}]
+const rawWordsRepo = {
+    'A1': ['Water', 'Family', 'House', 'Apple', 'Friend', 'School', 'Book', 'Time', 'Hand', 'Child'],
+    'A2': ['Believe', 'Travel', 'Daughter', 'Kitchen', 'Beautiful', 'Doctor', 'Airport', 'Choose', 'Forget', 'Simple'],
+    'B1': ['Appropriate', 'Challenge', 'Anxious', 'Development', 'Encourage', 'Frequent', 'Imagine', 'Manage', 'Reduce', 'Succeed'],
+    'B2': ['Sustainable', 'Abandon', 'Beneficial', 'Cooperate', 'Distinguish', 'Efficient', 'Inevitable', 'Maintain', 'Negotiate', 'Predict'],
+    'C1': ['Abstraction', 'Acquiesce', 'Benevolent', 'Capricious', 'Deleterious', 'Ephemeral', 'Garrulous', 'Inherent', 'Meticulous'],
+    'C2': ['Aberration', 'Anachronism', 'Cacophony', 'Epitome', 'Idiosyncrasy', 'Juxtaposition', 'Nefarious', 'Obfuscate', 'Quintessential', 'Sycophant']
 };
+
+async function fetchWordDetails(wordText) {
+    const cleanWord = wordText.trim();
+    let phonetic = "/.../";
+    let translation = "Переклад не знайдено";
+    
+    // 1. Запрос транскрипции напрямую (Dictionary API отлично работает БЕЗ прокси)
+    try {
+        const dictRes = await fetch(`https://dictionaryapi.dev{cleanWord.toLowerCase()}`);
+        if (dictRes.ok) {
+            const dictData = await dictRes.json();
+            if (Array.isArray(dictData) && dictData[0]) {
+                phonetic = dictData[0].phonetic || "/.../";
+                if (phonetic === "/.../" && dictData[0].phonetics) {
+                    const found = dictData[0].phonetics.find(p => p.text);
+                    if (found) phonetic = found.text;
+                }
+            }
+        }
+    } catch(e) {
+        console.warn("Не вдалося завантажити транскрипцію:", e);
+    }
+
+    // 2. Запрос перевода через официальный Google GTX API (он разрешен для всех localhost без CORS)
+    try {
+        const gtxUrl = `https://googleapis.com{encodeURIComponent(cleanWord)}`;
+        const transRes = await fetch(gtxUrl);
+        if (transRes.ok) {
+            const transData = await transRes.json();
+            // Разбор нативного массива Google Translate
+            if (transData && transData[0] && transData[0][0] && transData[0][0][0]) {
+                translation = transData[0][0][0].trim();
+                translation = translation.charAt(0).toUpperCase() + translation.slice(1);
+            }
+        }
+    } catch(e) {
+        console.warn("Помилка Google API, пробуємо резерв MyMemory:", e);
+        try {
+            const myMemRes = await fetch(`https://translated.net{encodeURIComponent(cleanWord)}&langpair=en|uk`);
+            if (myMemRes.ok) {
+                const data = await myMemRes.json();
+                if (data?.responseData?.translatedText) {
+                    translation = data.responseData.translatedText.trim();
+                    translation = translation.charAt(0).toUpperCase() + translation.slice(1);
+                }
+            }
+        } catch(err) {
+            translation = "Помилка мережі";
+        }
+    }
+
+    return { w: cleanWord, p: phonetic, t: translation };
+}
+
 
 let currentDeck = [];
 const stack = document.getElementById('stack');
 const zones = { L: document.getElementById('zoneL'), R: document.getElementById('zoneR'), T: document.getElementById('zoneT') };
 
-function setLevel(lvl) {
+async function setLevel(lvl) {
     document.querySelectorAll('.level-btn').forEach(b => b.classList.toggle('active', b.innerText === lvl));
-    currentDeck = [...(database[lvl] || database['C1'])];
-    renderCard();
+    document.getElementById('status').innerText = `ЗАВАНТАЖЕННЯ...`;
+    
+    const wordsList = [...(rawWordsRepo[lvl] || rawWordsRepo['C1'])];
+    currentDeck = [];
+    wordsList.forEach(word => {
+        currentDeck.push({ w: word, p: '', t: '', loaded: false });
+    });
+    
+    await renderCard();
 }
+
+async function renderCard() {
+    // 1. Очищаем стек перед отрисовкой
+    stack.innerHTML = "";
+
+    // 2. Проверяем, не закончились ли слова в колоде
+    if (!currentDeck || currentDeck.length === 0) {
+        stack.innerHTML = "<div style='text-align:center; padding-top:150px;'><h3>РІВЕНЬ ПРОЙДЕНО!</h3></div>";
+        document.getElementById('status').innerText = `ЗАЛИШИЛОСЬ: 0`;
+        return;
+    }
+
+    // 3. Обновляем счетчик оставшихся слов
+    document.getElementById('status').innerText = `ЗАЛИШИЛОСЬ: ${currentDeck.length}`;
+    
+    // 4. Если первое слово в массиве еще не загружено, показываем лоадер и делаем онлайн-запрос
+    if (!currentDeck[0].loaded) {
+        stack.innerHTML = "<div style='text-align:center; padding-top:150px; color: var(--accent); font-weight:bold;'>ЗАВАНТАЖЕННЯ...</div>";
+        
+        // Отправляем слово в функцию fetchWordDetails
+        const details = await fetchWordDetails(currentDeck[0].w);
+        
+        // Записываем полученный перевод и транскрипцию в первый элемент массива
+        currentDeck[0] = { ...details, loaded: true };
+        
+        // Перерисовываем карточку уже с готовыми данными
+        renderCard();
+        return; // Выходим из текущего вызова, чтобы не дублировать разметку
+    }
+
+    // 5. Берем готовые данные первого слова
+    const data = currentDeck[0];
+    
+    // 6. Создаем DOM-элемент карточки
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.touchAction = 'none'; // Критично для плавной работы pointermove на смартфонах
+    
+    card.innerHTML = `
+        <button class="audio-btn" onclick="event.stopPropagation(); speak('${data.w.replace(/'/g, "\\'")}')">
+            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        </button>
+        <div class="word">${data.w}</div>
+        <div class="phonetic">${data.p}</div>
+        <div class="translation">${data.t}</div>
+    `;
+    
+    // 7. Вешаем слушатель свайпов и добавляем на экран
+    card.addEventListener('pointerdown', startDrag);
+    stack.appendChild(card);
+}
+
 
 function speak(text) {
     window.speechSynthesis.cancel();
@@ -376,75 +233,85 @@ function speak(text) {
     window.speechSynthesis.speak(ut);
 }
 
-function renderCard() {
-    stack.innerHTML = "";
-    if (currentDeck.length === 0) {
-        stack.innerHTML = "<div style='text-align:center; padding-top:150px;'><h3>УРОВЕНЬ ПРОЙДЕН!</h3></div>";
-        return;
-    }
-    const data = currentDeck[0];
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-        <button class="audio-btn" onclick="event.stopPropagation(); speak('${data.w}')">
-            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-        </button>
-        <div class="word">${data.w}</div>
-        <div class="phonetic">${data.p}</div>
-        <div class="translation">${data.t}</div>
-    `;
-    card.addEventListener('pointerdown', startDrag);
-    stack.appendChild(card);
-    document.getElementById('status').innerText = `ЗАЛИШИЛОСЬ: ${currentDeck.length}`;
-}
 
 function startDrag(e) {
     const card = e.currentTarget;
-    let startX = e.clientX, startY = e.clientY, isDragging = false;
+    let startX = e.clientX;
+    let startY = e.clientY;
+    let isDragging = false;
+
     const move = (me) => {
-        let dx = me.clientX - startX, dy = me.clientY - startY;
-        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) isDragging = true;
+        let dx = me.clientX - startX;
+        let dy = me.clientY - startY;
+
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+            isDragging = true;
+        }
+
         card.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx / 25}deg)`;
+
+        // Сброс активных классов со всех зон
         Object.values(zones).forEach(z => z.classList.remove('active-learned', 'active-review', 'active-deferred'));
-        if (dx > 130) zones.R.classList.add('active-learned');
-        else if (dx < -130) zones.L.classList.add('active-deferred');
-        else if (dy < -130) zones.T.classList.add('active-review');
+
+        // Подсветка зон при перетаскивании
+        if (dx > 130) {
+            zones.R.classList.add('active-learned');
+        } else if (dx < -130) {
+            zones.L.classList.add('active-deferred');
+        } else if (dy < -130) {
+            zones.T.classList.add('active-review');
+        }
     };
+
     const up = (ue) => {
-        let dx = ue.clientX - startX, dy = ue.clientY - startY;
+        let dx = ue.clientX - startX;
+        let dy = ue.clientY - startY;
+
         if (!isDragging) {
+            // Переворот карточки для показа перевода
             card.classList.toggle('show-translation');
             card.style.transform = '';
         } else {
-            if (dx > 160) finalize(card, 1200, dy, 'next');
-            else if (dx < -160) finalize(card, -1200, dy, 'next');
-            else if (dy < -160) finalize(card, dx, -1200, 'repeat');
-            else card.style.transform = '';
+            // Логика свайпов в стороны и вверх
+            if (dx > 160) {
+                finalize(card, 1200, dy, 'next');
+            } else if (dx < -160) {
+                finalize(card, -1200, dy, 'next');
+            } else if (dy < -160) {
+                finalize(card, dx, -1200, 'repeat');
+            } else {
+                card.style.transform = '';
+            }
         }
+
+        // Очистка стилей зон и удаление слушателей
         Object.values(zones).forEach(z => z.classList.remove('active-learned', 'active-review', 'active-deferred'));
         document.removeEventListener('pointermove', move);
         document.removeEventListener('pointerup', up);
     };
+
     document.addEventListener('pointermove', move);
     document.addEventListener('pointerup', up);
 }
 
 function finalize(card, x, y, action) {
+    // ВИПРАВЛЕНО: Добавлены косые кавычки для корректной работы строки transform
     card.style.transition = '0.5s cubic-bezier(0.23, 1, 0.32, 1)';
-    card.style.transform = `translate(${x}px, ${y}px) rotate(${x/10}deg)`;
+    card.style.transform = `translate(${x}px, ${y}px) rotate(${x / 10}deg)`;
     card.style.opacity = '0';
+
     const word = currentDeck.shift();
-    if (action === 'repeat') {
+
+    // Интервальное повторение: возвращаем слово через 4 карточки
+    if (action === 'repeat' && word) {
         currentDeck.splice(4, 0, word);
     }
+
     setTimeout(renderCard, 400);
 }
 
+// Запуск стартового уровня
 setLevel('C1');
 </script>
 </body>
 </html>
-
-
-
-
