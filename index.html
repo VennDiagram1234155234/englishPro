@@ -94,125 +94,108 @@
     <div class="status-info" id="status">ЗАВАНТАЖЕННЯ...</div>
 
 <script>
-const rawWordsRepo = {
-    'A1': ['Water', 'Bottle'],
-    'A2': ['Believe', 'Travel', 'Daughter', 'Kitchen', 'Beautiful', 'Doctor', 'Airport', 'Choose', 'Forget', 'Simple'],
-    'B1': ['Appropriate', 'Challenge', 'Anxious', 'Development', 'Encourage', 'Frequent', 'Imagine', 'Manage', 'Reduce', 'Succeed'],
-    'B2': ['Sustainable', 'Abandon', 'Beneficial', 'Cooperate', 'Distinguish', 'Efficient', 'Inevitable', 'Maintain', 'Negotiate', 'Predict'],
-    'C1': ['Abstraction', 'Acquiesce', 'Benevolent', 'Capricious', 'Deleterious', 'Ephemeral', 'Garrulous', 'Inherent', 'Meticulous'],
-    'C2': ['Aberration', 'Anachronism', 'Cacophony', 'Epitome', 'Idiosyncrasy', 'Juxtaposition', 'Nefarious', 'Obfuscate', 'Quintessential', 'Sycophant']
-};
+// Настройки языка сессии (english — по умолчанию, german — на будущее)
+let currentLang = "english"; 
 
-// Переменная для хранения ссылки на аудиофайл текущего слова
-let currentAudioUrl = '';
-
-async function fetchWordDetails(wordText) {
-    const cleanWord = wordText.trim();
-    let phonetic = "/.../", translation = "Переклад не знайдено";
-    currentAudioUrl = ''; // Сброс аудио для нового слова
-
-    // Используем прокси для обхода CORS и делаем запрос к Cambridge Dictionary
-    const proxyUrl = "https://herokuapp.com";
-    const targetUrl = `https://cambridge.org{cleanWord.toLowerCase()}`;
-
-    try {
-        const response = await fetch(proxyUrl + targetUrl, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-
-        if (response.ok) {
-            const htmlText = await response.text();
-            const doc = new DOMParser().parseFromString(htmlText, 'text/html');
-
-            // Парсинг перевода, транскрипции и аудио
-            const translationElement = doc.querySelector('.trans.dtrans.dtrans-se');
-            if (translationElement) translation = translationElement.innerText.trim();
-            
-            const ipaElement = doc.querySelector('.uk.dpron-i .ipa.dipa.lmd-2, .ipa.dipa');
-            if (ipaElement) phonetic = `/${ipaElement.innerText.trim()}/`;
-
-            const audioSource = doc.querySelector('.uk.dpron-i source[type="audio/mpeg"]');
-            if (audioSource?.getAttribute('src')) {
-                currentAudioUrl = 'https://cambridge.org' + audioSource.getAttribute('src');
-            }
-        } else throw new Error('Ошибка словаря');
-    } catch (e) {
-        // Резервный вариант через Google Translate
-        try {
-            const gtxUrl = `https://googleapis.com{encodeURIComponent(cleanWord)}`;
-            const transRes = await fetch(gtxUrl);
-            const data = await transRes.json();
-            if (data?.[0]?.[0]?.[0]) translation = data[0][0][0].trim();
-        } catch (err) { translation = "Помилка мережі"; }
-    }
-    return { w: cleanWord, p: phonetic, t: translation };
-}
-
-// Воспроизведение аудио из Cambridge или синтезатор речи
-function speak(text) {
-    if (currentAudioUrl) {
-        new Audio(currentAudioUrl).play().catch(e => console.warn(e));
-    } else {
-        window.speechSynthesis.cancel();
-        const ut = new SpeechSynthesisUtterance(text);
-        ut.lang = 'en-US';
-        window.speechSynthesis.speak(ut);
-    }
-}
+// Глобальная переменная для хранения всей скачанной базы данных
+let wordsDatabase = null;
 
 let currentDeck = [];
 const stack = document.getElementById('stack');
-const zones = { L: document.getElementById('zoneL'), R: document.getElementById('zoneR'), T: document.getElementById('zoneT') };
+const zones = { 
+    L: document.getElementById('zoneL'), 
+    R: document.getElementById('zoneR'), 
+    T: document.getElementById('zoneT') 
+};
+
+// Функция локального поиска слова в words.json вместо онлайн-запросов
+async function fetchWordDetails(wordText) {
+    const cleanWord = wordText.trim();
+    let phonetic = "/.../", translation = "Переклад не знайдено";
+
+    try {
+        // Скачиваем файл с GitHub один раз за сессию
+        if (!wordsDatabase) {
+            const response = await fetch('./words.json');
+            if (!response.ok) throw new Error();
+            wordsDatabase = await response.json();
+        }
+
+        // Ищем массив слов для текущего языка и выбранного уровня (lvl)
+        const levelWords = wordsDatabase[currentLang]?.[currentLevel] || [];
+        
+        // Находим нужное слово в массиве
+        const found = levelWords.find(item => item.w.toLowerCase() === cleanWord.toLowerCase());
+        
+        if (found) {
+            phonetic = found.p || "/.../";
+            translation = found.t || "Переклад не знайдено";
+        } else {
+            translation = "Слово не знайдено в JSON";
+        }
+    } catch (e) {
+        translation = "Помилка файлу words.json";
+    }
+    
+    return { w: cleanWord, p: phonetic, t: translation };
+}
+
+// Глобальная переменная для отслеживания выбранного уровня кнопками
+let currentLevel = 'C1'; 
 
 async function setLevel(lvl) {
+    currentLevel = lvl; // Обновляем текущий уровень
     document.querySelectorAll('.level-btn').forEach(b => b.classList.toggle('active', b.innerText === lvl));
     document.getElementById('status').innerText = `ЗАВАНТАЖЕННЯ...`;
     
-    const wordsList = [...(rawWordsRepo[lvl] || rawWordsRepo['C1'])];
-    currentDeck = [];
-    wordsList.forEach(word => {
-        currentDeck.push({ w: word, p: '', t: '', loaded: false });
-    });
+    try {
+        // Скачиваем базу, если её еще нет
+        if (!wordsDatabase) {
+            const response = await fetch('./words.json');
+            if (!response.ok) throw new Error();
+            wordsDatabase = await response.json();
+        }
+        
+        // Берём слова из JSON. Если массив пустой, используем заглушку, чтобы приложение не падало
+        const wordsList = wordsDatabase[currentLang]?.[lvl] || [];
+        
+        currentDeck = [];
+        wordsList.forEach(item => {
+            currentDeck.push({ w: item.w, p: item.p || '/.../', t: item.t, loaded: true });
+        });
+        
+    } catch (e) {
+        console.error("Не вдалося завантажити слова з JSON:", e);
+        currentDeck = [{ w: "Error", p: "/.../", t: "Створіть words.json у репозиторії", loaded: true }];
+    }
     
     await renderCard();
 }
 
 async function renderCard() {
-    // 1. Очищаем стек перед отрисовкой
     stack.innerHTML = "";
 
-    // 2. Проверяем, не закончились ли слова в колоде
     if (!currentDeck || currentDeck.length === 0) {
         stack.innerHTML = "<div style='text-align:center; padding-top:150px;'><h3>РІВЕНЬ ПРОЙДЕНО!</h3></div>";
         document.getElementById('status').innerText = `ЗАЛИШИЛОСЬ: 0`;
         return;
     }
 
-    // 3. Обновляем счетчик оставшихся слов
     document.getElementById('status').innerText = `ЗАЛИШИЛОСЬ: ${currentDeck.length}`;
     
-    // 4. Если первое слово в массиве еще не загружено, показываем лоадер и делаем онлайн-запрос
+    // Этот блок теперь отрабатывает мгновенно, так как все данные уже loaded: true
     if (!currentDeck[0].loaded) {
         stack.innerHTML = "<div style='text-align:center; padding-top:150px; color: var(--accent); font-weight:bold;'>ЗАВАНТАЖЕННЯ...</div>";
-        
-        // Отправляем слово в функцию fetchWordDetails
         const details = await fetchWordDetails(currentDeck[0].w);
-        
-        // Записываем полученный перевод и транскрипцию в первый элемент массива
         currentDeck[0] = { ...details, loaded: true };
-        
-        // Перерисовываем карточку уже с готовыми данными
         renderCard();
-        return; // Выходим из текущего вызова, чтобы не дублировать разметку
+        return; 
     }
 
-    // 5. Берем готовые данные первого слова
     const data = currentDeck[0];
-    
-    // 6. Создаем DOM-элемент карточки
     const card = document.createElement('div');
     card.className = 'card';
-    card.style.touchAction = 'none'; // Критично для плавной работы pointermove на смартфонах
+    card.style.touchAction = 'none'; 
     
     card.innerHTML = `
         <button class="audio-btn" onclick="event.stopPropagation(); speak('${data.w.replace(/'/g, "\\'")}')">
@@ -223,19 +206,17 @@ async function renderCard() {
         <div class="translation">${data.t}</div>
     `;
     
-    // 7. Вешаем слушатель свайпов и добавляем на экран
     card.addEventListener('pointerdown', startDrag);
     stack.appendChild(card);
 }
 
-
+// Обновленная функция озвучки с поддержкой будущих языков
 function speak(text) {
     window.speechSynthesis.cancel();
     const ut = new SpeechSynthesisUtterance(text);
-    ut.lang = 'en-US';
+    ut.lang = (currentLang === "german") ? 'de-DE' : 'en-US';
     window.speechSynthesis.speak(ut);
 }
-
 
 function startDrag(e) {
     const card = e.currentTarget;
@@ -253,10 +234,8 @@ function startDrag(e) {
 
         card.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx / 25}deg)`;
 
-        // Сброс активных классов со всех зон
         Object.values(zones).forEach(z => z.classList.remove('active-learned', 'active-review', 'active-deferred'));
 
-        // Подсветка зон при перетаскивании
         if (dx > 130) {
             zones.R.classList.add('active-learned');
         } else if (dx < -130) {
@@ -271,11 +250,9 @@ function startDrag(e) {
         let dy = ue.clientY - startY;
 
         if (!isDragging) {
-            // Переворот карточки для показа перевода
             card.classList.toggle('show-translation');
             card.style.transform = '';
         } else {
-            // Логика свайпов в стороны и вверх
             if (dx > 160) {
                 finalize(card, 1200, dy, 'next');
             } else if (dx < -160) {
@@ -287,7 +264,6 @@ function startDrag(e) {
             }
         }
 
-        // Очистка стилей зон и удаление слушателей
         Object.values(zones).forEach(z => z.classList.remove('active-learned', 'active-review', 'active-deferred'));
         document.removeEventListener('pointermove', move);
         document.removeEventListener('pointerup', up);
@@ -298,14 +274,12 @@ function startDrag(e) {
 }
 
 function finalize(card, x, y, action) {
-    // ВИПРАВЛЕНО: Добавлены косые кавычки для корректной работы строки transform
     card.style.transition = '0.5s cubic-bezier(0.23, 1, 0.32, 1)';
     card.style.transform = `translate(${x}px, ${y}px) rotate(${x / 10}deg)`;
     card.style.opacity = '0';
 
     const word = currentDeck.shift();
 
-    // Интервальное повторение: возвращаем слово через 4 карточки
     if (action === 'repeat' && word) {
         currentDeck.splice(4, 0, word);
     }
@@ -313,7 +287,7 @@ function finalize(card, x, y, action) {
     setTimeout(renderCard, 400);
 }
 
-// Запуск стартового уровня
+// Запуск стартового уровня при первой загрузке страницы
 setLevel('C1');
 </script>
 </body>
